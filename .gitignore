@@ -1,0 +1,20 @@
+# .NET
+backend/**/bin/
+backend/**/obj/
+*.user
+
+# Node
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# Environment
+.env
+.env.local
+appsettings.Development.json
+
+# IDE
+.vs/
+.vscode/
+*.suo
+.claude/

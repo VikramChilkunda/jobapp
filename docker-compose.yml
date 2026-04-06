@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: jobapp-db
+    environment:
+      POSTGRES_DB: jobapp
+      POSTGRES_USER: jobapp
+      POSTGRES_PASSWORD: jobapp_dev_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jobapp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend/JobApp.Api
+    container_name: jobapp-api
+    ports:
+      - "5000:5000"
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=jobapp;Username=jobapp;Password=jobapp_dev_password"
+      Jwt__Key: "YourSuperSecretKeyThatIsAtLeast32Characters!"
+      Jwt__Issuer: "JobApp.Api"
+      Jwt__Audience: "JobApp.Frontend"
+      Gemini__ApiKey: "${GEMINI_API_KEY:-YOUR_GEMINI_API_KEY_HERE}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: jobapp-web
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:5000"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

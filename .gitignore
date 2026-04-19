@@ -18,3 +18,4 @@ appsettings.Development.json
 .vscode/
 *.suo
 .claude/
+resume.tex
